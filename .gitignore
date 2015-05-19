@@ -1,0 +1,5 @@
+*.bak
+application/logs
+.commit_state
+.dev_state
+assets/uploads/*
