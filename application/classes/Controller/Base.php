@@ -2,11 +2,11 @@
 
     class Controller_Base extends Controller_Template
     {
-        public $template = 'layouts/base';
+        public $template = 'layout/base';
 
-        protected $header = 'layouts/header';
+        protected $header = 'layout/header';
         protected $content = '';
-        protected $footer = 'layouts/footer';
+        protected $footer = 'layout/footer';
 
         protected $render = true;
 
@@ -15,6 +15,8 @@
 
         public function __construct($request, $response)
         {
+			// Default image
+			$this->imageHeader = URL::site('assets/img/home-bg.jpg');
             parent::__construct($request, $response);
         }
 
