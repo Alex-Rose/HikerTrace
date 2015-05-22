@@ -2,31 +2,27 @@
 
    class Helper_Image
    {
-       public static function writeImage($model, $id, &$response, $thumb = false)
+       public static function writeImage($name, $id, &$response, $thumb = false)
        {
-           $obj = ORM::factory($model, $id);
-           if ($thumb && file_exists('assets/uploads/'.strtolower($model).'/thumbs/'.$id.'.jpg'))
+		   $thumb = 'assets/uploads/hike/'.$id.'/thumbs/'.$name;
+		   $computed = 'assets/uploads/hike/'.$id.'/computed/'.$name;
+           if ($thumb && file_exists($thumb))
            {
-               $file = 'assets/uploads/'.strtolower($model).'/thumbs/'.$id.'.jpg';
+               $file = $thumb;
                $response->headers('Content-Type', 'image/jpg');
            }
-           else if ($obj->image == 'JPG' && file_exists('assets/uploads/'.strtolower($model).'/'.$id.'.jpg'))
+		   else if ($thumb && file_exists($computed))
+		   {
+			   self::thumb($computed, 1920, 1200, $thumb);
+			   $file = $thumb;
+		   }
+           else if (!$thumb && file_exists($computed))
            {
-               $file = 'assets/uploads/'.strtolower($model).'/'.$id.'.jpg';
-               self::rotate($file);
+               $file = $computed;
                $response->headers('Content-Type', 'image/jpg');
-           }
-           else if ($obj->image == 'PNG' && file_exists('assets/uploads/'.strtolower($model).'/'.$id.'.png'))
-           {
-               $file = 'assets/uploads/'.strtolower($model).'/'.$id.'.png';
-               $response->headers('Content-Type', 'image/png');
            }
            else
            {
-               // We dont want the default bee anymore
-//               $file = 'assets/img/aep.png';
-//               $response->headers('Content-Type', 'image/png');
-
                $data['success'] = false;
 
                echo json_encode($data);
@@ -92,7 +88,7 @@
 
 
        // This fixes the orientation of phone pictures
-       public static function rotate($image)
+       public static function rotate($baseURL, $name, $image)
        {
            $exif = exif_read_data($image);
 
@@ -111,11 +107,14 @@
                    case 8:
                        $jpg = imagerotate($jpg, 90, 0);
                        break;
-                   default:
-                       return;
+                   default: 	
                }
-               imagejpeg($jpg, $image, 90);
+               imagejpeg($jpg, $baseURL.'computed/'.$name, 90);
            }
+		   else
+		   {
+			   copy($image, $baseURL.'computed/'.$name);
+		   }
        }
 
        // http://stackoverflow.com/questions/1855996/crop-image-in-php
@@ -196,4 +195,63 @@
            $thumb->clear();
            $thumb->destroy();
        }
+	   
+	   public static function extractLocation($image)
+	   {
+		   $path = 'assets/uploads/hike/'.$image->hikeID.'/orig/'.$image->name;
+           $exif = exif_read_data($path);
+		  
+
+           if (array_key_exists('GPSLatitudeRef', $exif) && array_key_exists('GPSLatitude', $exif))
+           {
+               $ref = $exif['GPSLatitudeRef'];
+               $latitude = $exif['GPSLatitude'];
+			   
+			   $degree = self::splitGPS($latitude[0]);
+			   $minute = self::splitGPS($latitude[1]);
+			   $second = self::splitGPS($latitude[2]);
+			   
+			   $lat = $degree + ($minute / 60) + ($second / 3600);
+			   
+			   if (strtolower($exif['GPSLatitudeRef']) == 's')
+			   {
+				   $lat *= -1;
+			   }
+			   
+			   $image->lat = $lat;
+		   }
+		   
+		   if (array_key_exists('GPSLongitudeRef', $exif) && array_key_exists('GPSLongitude', $exif))
+           {
+               $ref = $exif['GPSLongitudeRef'];
+               $longitude = $exif['GPSLongitude'];
+			   
+			   $degree = self::splitGPS($longitude[0]);
+			   $minute = self::splitGPS($longitude[1]);
+			   $second = self::splitGPS($longitude[2]);
+			   
+			   $lon = $degree + ($minute / 60) + ($second / 3600);
+			   
+			   if (strtolower($exif['GPSLongitudeRef']) == 'w')
+			   {
+				   $lon *= -1;
+			   }
+			   
+			   $image->lon = $lon;
+		   }
+		   
+		   $image->save();
+	   }
+	   
+	   protected static function splitGPS($coord)
+	   {
+			$parts = explode('/', $coord);
+
+			  if(count($parts) <= 0)// jic
+				return 0;
+			  if(count($parts) == 1)
+				return $parts[0];
+
+			  return floatval($parts[0]) / floatval($parts[1]);
+	   }
    }

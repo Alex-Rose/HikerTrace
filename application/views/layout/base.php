@@ -15,7 +15,7 @@
     <link href="<?php echo URL::site('assets/bootstrap/css/bootstrap.min.css');?>" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="<?php echo URL::site('assets/css/clean-blog.min.css');?>" rel="stylesheet">
+    <link href="<?php echo URL::site('assets/css/clean-blog.css');?>" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -33,6 +33,16 @@
 </head>
 
 <body>
+
+	<!-- jQuery -->
+    <script src="<?php echo URL::site('assets/js/jquery-2.1.3.min.js');?>"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="<?php echo URL::site('assets/bootstrap/js/bootstrap.min.js');?>"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="<?php echo URL::site('assets/js/clean-blog.js"');?>"></script>
+
 	<?php echo $header;?> 
 
     <!-- Main Content -->
@@ -44,15 +54,6 @@
 
     <!-- Footer -->
     <?php echo $footer;?>
-
-    <!-- jQuery -->
-    <script src="<?php echo URL::site('assets/js/jquery-2.1.3.min.js');?>"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="<?php echo URL::site('assets/bootstrap/js/bootstrap.min.js');?>"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="<?php echo URL::site('assets/js/clean-blog.min.js"');?>"></script>
 
 </body>
 

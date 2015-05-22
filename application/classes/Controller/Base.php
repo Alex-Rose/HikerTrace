@@ -16,7 +16,7 @@
         public function __construct($request, $response)
         {
 			// Default image
-			$this->imageHeader = URL::site('assets/img/home-bg.jpg');
+			$this->imageHeader = URL::site('assets/img/home.jpg');
             parent::__construct($request, $response);
         }
 

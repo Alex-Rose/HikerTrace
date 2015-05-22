@@ -17,4 +17,13 @@
 		{
 			$this->content = View::factory('report');
 		}
+		
+		public function action_hike()
+		{
+			$id = $this->request->param('id');
+			$this->hike = ORM::factory('Hike', $id);
+			$this->content = View::factory('hike');
+		}
+		
+		
     }
